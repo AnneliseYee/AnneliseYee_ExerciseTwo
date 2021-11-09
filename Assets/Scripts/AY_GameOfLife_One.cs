@@ -69,6 +69,12 @@ public class AY_GameOfLife_One : MonoBehaviour
         }
     }
 
+    public void Next() 
+    {
+        DoGameOfLifeIteration();
+    }
+    
+
     private void DoGameOfLifeIteration()
     {
         // Loops through every voxel in grid
