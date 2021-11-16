@@ -31,7 +31,7 @@ public class AY_GameOfLife_One : MonoBehaviour
                         //turn off all voxel layers above 0 
                         Vector3Int voxelYIndex = new Vector3Int(x, y, z);               //creates new index of voxels 
                         Voxel currentYVoxel = _grid.GetVoxelByIndex(voxelYIndex);       //gets current voxel using coordinates
-                        if (y > 0)                                                      //If the Y value is greater than 0 then voxels are not alive (only for the start)
+                        if (y > 0)                                                      //If the y>0, voxels not on for the start)
                         {
                             currentYVoxel.Alive = false;
                         }
@@ -39,6 +39,7 @@ public class AY_GameOfLife_One : MonoBehaviour
             }
         }
     }
+
 
     // Update is called once per frame
     void Update()
@@ -69,7 +70,7 @@ public class AY_GameOfLife_One : MonoBehaviour
         }
     }
 
-    private void PerformGameOfLifeIteration()
+     private void PerformGameOfLifeIteration()
     {
         if (Input.GetKeyDown(KeyCode.Space)) //if press space do something
         {
@@ -80,25 +81,34 @@ public class AY_GameOfLife_One : MonoBehaviour
 
     public void Next() 
     {
-        CopyLayer();
-        DoGameOfLifeIteration();
-        //CopyLayersToAbove();
+        StartCoroutine(automateGOL());
+        //CopyLayer();
+        //DoGameOfLifeIteration();
+    }
+
+    IEnumerator automateGOL() 
+    {
+        while (true)
+		{
+            CopyLayer();
+			DoGameOfLifeIteration();
+            yield return new WaitForSeconds(1);
+        }
     }
 
 	private void CopyLayer()
 	{
-		for (int y = _gridDimensions.y - 2; y >= 0; y--)
+		for (int y = _gridDimensions.y - 2; y >= 0; y--)                            //starts two from top of grid (because geting above voxel)
 		{
 			for (int x = 0; x < _gridDimensions.x; x++)
 			{
 				for (int z = 0; z < _gridDimensions.z; z++)
 				{
-                    Vector3Int voxelIndex = new Vector3Int(x, y, z);                 //create vector holding specific coordinates
-                    Voxel dumbVoxel = _grid.GetVoxelByIndex(voxelIndex);
-                    Vector3Int voxelIndexAbove = new Vector3Int(x, y + 1, z);
-                    print(voxelIndexAbove);
-					Voxel aboveVoxel = _grid.GetVoxelByIndex(voxelIndexAbove);
-					aboveVoxel.Alive = dumbVoxel.Alive;
+                    Vector3Int voxelIndex = new Vector3Int(x, y, z);                //create vector holding specific coordinates
+                    Voxel dumbVoxel = _grid.GetVoxelByIndex(voxelIndex);            //find voxel using coordinates
+                    Vector3Int voxelIndexAbove = new Vector3Int(x, y + 1, z);       //create voxel holding y++ coordinates
+					Voxel aboveVoxel = _grid.GetVoxelByIndex(voxelIndexAbove);      //find voxel above
+					aboveVoxel.Alive = dumbVoxel.Alive;                             //Voxel above becomes alive if voxel below is alive
 				}
 			}
 		}
@@ -106,7 +116,7 @@ public class AY_GameOfLife_One : MonoBehaviour
 
 	private void DoGameOfLifeIteration()
     {
-        for (int y = 0; y < _gridDimensions.y; y++)
+        for (int y = 0; y < 1; y++)
         {
             for (int x = 0; x < _gridDimensions.x; x++)
             {
@@ -114,8 +124,6 @@ public class AY_GameOfLife_One : MonoBehaviour
                 {
                     Vector3Int voxelIndex = new Vector3Int(x, y, z);                 //create vector holding specific coordinates
                     Voxel currentVoxel = _grid.GetVoxelByIndex(voxelIndex);         //find the voxel using those coordinates and store in currentVoxel
-					if (y < 1)                                                      //only apply GOL rules to 1st layer of voxels
-                    {
                         List<Voxel> neighbours = currentVoxel.GetNeighbourList();   //find neighbours of specific voxel in currentVoxel
                         int livingNeighbours = 0;
                         foreach (Voxel neighbour in neighbours)                     //for each voxel neighbor in the list neighbors
@@ -144,33 +152,8 @@ public class AY_GameOfLife_One : MonoBehaviour
                                 currentVoxel.Alive = true;
                             }
                         }
-                    }
                 }
             }
         }
     }
-    ////copy layer to above
-    //private void CopyLayersToAbove()
-    //{
-    //    for (int x = 0; x < _gridDimensions.x; x++)
-    //    {
-    //        for (int y = 0; y < _gridDimensions.y; y++)
-    //        {
-    //            for (int z = 0; z < _gridDimensions.z; z++)
-    //            {
-    //                Vector3Int voxelIndex = new Vector3Int(x, y, z);            //create vector holding specific coordinates
-    //                Voxel currentVoxel = _grid.GetVoxelByIndex(voxelIndex);     //find the voxel using those coordinates and store in currentVoxel
-    //                foreach (currentVoxel in voxelIndex)                        //for each voxel
-    //                {
-    //                    if (currentVoxel.Alive)
-    //                    {
-    //                        int Y;
-    //                        Y = y;
-    //                        Y = Y++;                                                //add 1 to the y value
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
 }
